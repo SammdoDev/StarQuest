@@ -3,562 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Star Collector - Enhanced Platformer Game</title>
+    <title>StarQuest</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.70.0/phaser.min.js"></script>
     <style>
         body {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            font-family: 'Arial', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin: 20px 0;
+            font-size: 2.5em;
+        }
+        
+        #gameContainer {
+            margin: 20px 0;
+            border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background: #000;
         }
         
-        .game-container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 25px;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .game-title {
-            color: #fff;
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .controls {
-            color: rgba(255, 255, 255, 0.9);
-            margin-top: 20px;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        
-        .control-item {
-            display: inline-block;
-            margin: 0 15px;
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        canvas {
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .loading {
-            color: #fff;
+        #startGameBtn {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 15px 30px;
             font-size: 18px;
-            margin-top: 10px;
-        }
-
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700; }
-            50% { text-shadow: 0 0 20px #FFD700, 0 0 30px #FFD700; }
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            margin: 20px;
         }
         
-        .game-title {
-            animation: glow 2s ease-in-out infinite;
+        #startGameBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.3);
         }
+        
+        #mobileControls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            max-width: 90vw;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #f0f0f0, #cacaca);
+            box-shadow: 
+                5px 5px 10px rgba(0,0,0,0.2),
+                -5px -5px 10px rgba(255,255,255,0.8);
+            color: #333;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        
+        .control-btn:active {
+            box-shadow: 
+                2px 2px 5px rgba(0,0,0,0.2) inset,
+                -2px -2px 5px rgba(255,255,255,0.8) inset;
+            transform: scale(0.95);
+        }
+        
+        .control-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+                text-align: center;
+            }
+            
+            #mobileControls {
+                position: fixed;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 1000;
+                margin: 0;
+            }
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 14px;
+            }
+        }
+        
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1 class="game-title">⭐ STAR COLLECTOR ⭐</h1>
+    <h1>🌟 StarQuest 🌟</h1>
+
+    
+    <button id="startGameBtn">🎮 Start Game</button>
+    
+    <div id="gameContainer">
         <div id="game"></div>
-        <div class="controls">
-            <span class="control-item">🎮 Arrow Keys to Move</span>
-            <span class="control-item">⬆️ Up Arrow to Jump</span>
-            <span class="control-item">⭐ Collect Stars</span>
-            <span class="control-item">💀 Avoid Enemies</span>
+    </div>
+    
+    <div id="mobileControls">
+        <div class="control-row">
+            <button class="control-btn" id="leftBtn">←</button>
+            <button class="control-btn" id="rightBtn">→</button>
+        </div>
+        <div class="control-row">
+            <button class="control-btn" id="jumpBtn">↑</button>
         </div>
     </div>
 
-    <script>
-        // Game variables
-        let player;
-        let stars;
-        let platforms;
-        let enemies;
-        let score = 0;
-        let level = 1;
-        let lives = 3;
-        let scoreText;
-        let levelText;
-        let livesText;
-        let cursors;
-        let gameOver = false;
-
-        // Create placeholder assets with correct dimensions
-        function createAssets(scene) {
-            // Sky background - gradient blue sky
-            const skyGraphics = scene.add.graphics();
-            skyGraphics.fillGradientStyle(0x87CEEB, 0x4169E1, 0xE0F6FF, 0x87CEEB);
-            skyGraphics.fillRect(0, 0, 800, 600);
-            skyGraphics.generateTexture('sky', 800, 600);
-            skyGraphics.destroy();
-
-            // Platform - green grass platform
-            const platformGraphics = scene.add.graphics();
-            platformGraphics.fillStyle(0x228B22);
-            platformGraphics.fillRoundedRect(0, 0, 400, 32, 8);
-            
-            // Add grass texture effect
-            platformGraphics.lineStyle(1, 0x32CD32);
-            for (let i = 0; i < 40; i++) {
-                const x = i * 10;
-                platformGraphics.moveTo(x, 0);
-                platformGraphics.lineTo(x + 2, -3);
-                platformGraphics.moveTo(x + 4, 0);
-                platformGraphics.lineTo(x + 6, -2);
-            }
-            platformGraphics.strokePath();
-            
-            platformGraphics.lineStyle(2, 0x006400);
-            platformGraphics.strokeRoundedRect(0, 0, 400, 32, 8);
-            platformGraphics.generateTexture('ground', 400, 32);
-            platformGraphics.destroy();
-
-            // Star - golden star with sparkle effect
-            const starGraphics = scene.add.graphics();
-            starGraphics.fillStyle(0xFFD700);
-            starGraphics.beginPath();
-            
-            const centerX = 12;
-            const centerY = 12;
-            const arms = 5;
-            const outerRadius = 12;
-            const innerRadius = 6;
-            
-            for (let i = 0; i < arms * 2; i++) {
-                const angle = (i * Math.PI) / arms;
-                const radius = i % 2 === 0 ? outerRadius : innerRadius;
-                const x = centerX + Math.cos(angle) * radius;
-                const y = centerY + Math.sin(angle) * radius;
-                
-                if (i === 0) {
-                    starGraphics.moveTo(x, y);
-                } else {
-                    starGraphics.lineTo(x, y);
-                }
-            }
-            starGraphics.closePath();
-            starGraphics.fillPath();
-            
-            // Add sparkle effect
-            starGraphics.fillStyle(0xFFFFFF);
-            starGraphics.fillCircle(centerX - 3, centerY - 3, 1);
-            starGraphics.fillCircle(centerX + 4, centerY + 2, 1);
-            
-            starGraphics.lineStyle(2, 0xFFA500);
-            starGraphics.strokePath();
-            starGraphics.generateTexture('star', 24, 24);
-            starGraphics.destroy();
-
-            // Player - blue character
-            const dudeGraphics = scene.add.graphics();
-            dudeGraphics.fillStyle(0x4169E1);
-            dudeGraphics.fillRoundedRect(0, 0, 32, 48, 8);
-            
-            // Add face
-            dudeGraphics.fillStyle(0xFFDBB5);
-            dudeGraphics.fillCircle(16, 16, 12);
-            
-            // Eyes
-            dudeGraphics.fillStyle(0x000000);
-            dudeGraphics.fillCircle(12, 14, 2);
-            dudeGraphics.fillCircle(20, 14, 2);
-            
-            // Smile
-            dudeGraphics.lineStyle(2, 0x000000);
-            dudeGraphics.beginPath();
-            dudeGraphics.arc(16, 18, 6, 0.2, Math.PI - 0.2);
-            dudeGraphics.strokePath();
-            
-            dudeGraphics.generateTexture('dude', 32, 48);
-            dudeGraphics.destroy();
-
-            // Enemy - red spiky enemy
-            const enemyGraphics = scene.add.graphics();
-            enemyGraphics.fillStyle(0xFF4444);
-            enemyGraphics.fillRoundedRect(0, 0, 32, 32, 4);
-            
-            // Add spikes
-            enemyGraphics.fillStyle(0x990000);
-            for (let i = 0; i < 4; i++) {
-                const x = i * 8 + 4;
-                enemyGraphics.fillTriangle(x, 0, x + 4, -6, x + 8, 0);
-                enemyGraphics.fillTriangle(x, 32, x + 4, 38, x + 8, 32);
-            }
-            
-            // Add evil eyes
-            enemyGraphics.fillStyle(0xFFFFFF);
-            enemyGraphics.fillCircle(10, 12, 4);
-            enemyGraphics.fillCircle(22, 12, 4);
-            enemyGraphics.fillStyle(0xFF0000);
-            enemyGraphics.fillCircle(10, 12, 2);
-            enemyGraphics.fillCircle(22, 12, 2);
-            
-            enemyGraphics.generateTexture('enemy', 32, 32);
-            enemyGraphics.destroy();
-        }
-
-        class GameScene extends Phaser.Scene {
-            constructor() {
-                super({ key: 'GameScene' });
-            }
-
-            preload() {
-                createAssets(this);
-                
-                const loadingText = this.add.text(400, 300, '', {
-                    fontSize: '20px',
-                    color: '#ffffff',
-                    fontStyle: 'bold'
-                });
-                loadingText.setOrigin(0.5);
-            }
-
-            create() {
-                // Background
-                this.add.image(400, 300, 'sky');
-                
-                // Create platforms based on level
-                this.createPlatforms();
-                
-                // Player
-                player = this.physics.add.sprite(100, 450, 'dude');
-                player.setBounce(0.2);
-                player.setCollideWorldBounds(true);
-                
-                // Create stars and enemies based on level
-                this.createStars();
-                this.createEnemies();
-                
-                // UI Text
-                scoreText = this.add.text(16, 16, `Score: ${score}`, {
-                    fontSize: '24px',
-                    color: '#FFD700',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 2
-                });
-                
-                levelText = this.add.text(16, 50, `Level: ${level}`, {
-                    fontSize: '24px',
-                    color: '#00FF00',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 2
-                });
-                
-                livesText = this.add.text(16, 84, `Lives: ${lives}`, {
-                    fontSize: '24px',
-                    color: '#FF4444',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 2
-                });
-                
-                // Colliders
-                this.physics.add.collider(player, platforms);
-                this.physics.add.collider(stars, platforms);
-                this.physics.add.collider(enemies, platforms);
-                this.physics.add.overlap(player, stars, this.collectStar, null, this);
-                this.physics.add.overlap(player, enemies, this.hitEnemy, null, this);
-                
-                // Controls
-                cursors = this.input.keyboard.createCursorKeys();
-                
-                // Add particle effect for collected stars
-                this.starParticles = this.add.particles(0, 0, 'star', {
-                    scale: { start: 0.3, end: 0 },
-                    speed: { min: 50, max: 100 },
-                    lifespan: 300,
-                    emitting: false
-                });
-
-                // Add explosion effect for death
-                this.explosionParticles = this.add.particles(0, 0, 'enemy', {
-                    scale: { start: 0.5, end: 0 },
-                    speed: { min: 100, max: 200 },
-                    lifespan: 500,
-                    emitting: false
-                });
-                
-                gameOver = false;
-            }
-
-            createPlatforms() {
-                platforms = this.physics.add.staticGroup();
-                
-                // Base platform
-                platforms.create(400, 568, 'ground').setScale(2).refreshBody();
-                
-                // Level-specific platforms
-                if (level === 1) {
-                    platforms.create(600, 400, 'ground');
-                    platforms.create(50, 250, 'ground');
-                    platforms.create(750, 220, 'ground');
-                } else if (level === 2) {
-                    platforms.create(200, 450, 'ground');
-                    platforms.create(600, 350, 'ground');
-                    platforms.create(100, 200, 'ground');
-                    platforms.create(700, 150, 'ground');
-                    platforms.create(400, 280, 'ground');
-                } else {
-                    // Level 3 and beyond - more challenging layout
-                    platforms.create(150, 500, 'ground');
-                    platforms.create(450, 420, 'ground');
-                    platforms.create(650, 340, 'ground');
-                    platforms.create(200, 260, 'ground');
-                    platforms.create(550, 180, 'ground');
-                    platforms.create(350, 100, 'ground');
-                }
-            }
-
-            createStars() {
-                const starCount = Math.min(8 + level * 2, 15);
-                stars = this.physics.add.group({
-                    key: 'star',
-                    repeat: starCount - 1,
-                    setXY: { x: 50, y: 0, stepX: (700 / starCount) }
-                });
-                
-                stars.children.iterate(function (child) {
-                    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-                });
-            }
-
-            createEnemies() {
-                const enemyCount = Math.min(level, 6);
-                enemies = this.physics.add.group();
-                
-                for (let i = 0; i < enemyCount; i++) {
-                    const x = Phaser.Math.Between(200, 600);
-                    const enemy = enemies.create(x, 16, 'enemy');
-                    enemy.setBounce(1);
-                    enemy.setVelocity(Phaser.Math.Between(-100, 100), 20);
-                    enemy.setCollideWorldBounds(true);
-                }
-            }
-
-            update() {
-                if (gameOver) {
-                    return;
-                }
-
-                // Player movement
-                if (cursors.left.isDown) {
-                    player.setVelocityX(-160);
-                } else if (cursors.right.isDown) {
-                    player.setVelocityX(160);
-                } else {
-                    player.setVelocityX(0);
-                }
-                
-                if (cursors.up.isDown && player.body.touching.down) {
-                    player.setVelocityY(-330);
-                }
-
-                // Enemy AI - make them bounce around
-                enemies.children.iterate(function (enemy) {
-                    if (enemy.body.touching.left || enemy.body.touching.right) {
-                        enemy.setVelocityX(-enemy.body.velocity.x);
-                    }
-                });
-            }
-
-            collectStar(player, star) {
-                star.disableBody(true, true);
-                
-                // Add particle effect
-                this.starParticles.emitParticleAt(star.x, star.y, 10);
-                
-                score += 10 * level; // More points for higher levels
-                scoreText.setText(`Score: ${score}`);
-                
-                // Flash effect for score
-                scoreText.setTint(0xff0000);
-                this.time.delayedCall(200, () => {
-                    scoreText.clearTint();
-                });
-                
-                if (stars.countActive(true) === 0) {
-                    // Level completed!
-                    this.nextLevel();
-                }
-            }
-
-            hitEnemy(player, enemy) {
-                lives--;
-                livesText.setText(`Lives: ${lives}`);
-                
-                // Add explosion effect
-                this.explosionParticles.emitParticleAt(player.x, player.y, 15);
-                
-                // Screen shake
-                this.cameras.main.shake(200, 0.01);
-                
-                if (lives <= 0) {
-                    this.gameOverSequence();
-                } else {
-                    // Temporary invincibility and respawn
-                    player.setPosition(100, 450);
-                    player.setTint(0xff0000);
-                    player.setAlpha(0.5);
-                    
-                    // Remove invincibility after 2 seconds
-                    this.time.delayedCall(2000, () => {
-                        player.clearTint();
-                        player.setAlpha(1);
-                    });
-                }
-            }
-
-            nextLevel() {
-                level++;
-                levelText.setText(`Level: ${level}`);
-                
-                // Bonus points for completing level
-                score += 50 * level;
-                scoreText.setText(`Score: ${score}`);
-                
-                // Victory flash effect
-                this.cameras.main.flash(500, 255, 215, 0);
-                
-                // Show level complete message
-                const levelCompleteText = this.add.text(400, 250, `LEVEL ${level - 1} COMPLETE!`, {
-                    fontSize: '36px',
-                    color: '#FFD700',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 4
-                }).setOrigin(0.5);
-                
-                const nextLevelText = this.add.text(400, 300, `Get ready for Level ${level}!`, {
-                    fontSize: '24px',
-                    color: '#FFFFFF',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 3
-                }).setOrigin(0.5);
-                
-                // Pause briefly then restart with new level
-                this.time.delayedCall(2000, () => {
-                    levelCompleteText.destroy();
-                    nextLevelText.destroy();
-                    this.scene.restart();
-                });
-            }
-
-            gameOverSequence() {
-                gameOver = true;
-                
-                // Stop all physics
-                this.physics.pause();
-                player.setTint(0xff0000);
-                
-                // Screen fade to red
-                // Screen fade to red (move this before the text)
-                const fadeBackground = this.add.rectangle(0, 0, 800, 600, 0xFF0000);
-                fadeBackground.setOrigin(0);
-                fadeBackground.setAlpha(0);
-                this.tweens.add({
-                    targets: fadeBackground,
-                    alpha: 1,
-                    duration: 1000
-                });
-                
-                // Game Over text
-                const gameOverText = this.add.text(400, 200, 'GAME OVER', {
-                    fontSize: '64px',
-                    color: '#FF0000',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 6
-                }).setOrigin(0.5);
-                
-                const finalScoreText = this.add.text(400, 280, `Final Score: ${score}`, {
-                    fontSize: '32px',
-                    color: '#FFD700',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 4
-                }).setOrigin(0.5);
-                
-                const levelReachedText = this.add.text(400, 320, `Level Reached: ${level}`, {
-                    fontSize: '24px',
-                    color: '#FFFFFF',
-                    fontStyle: 'bold',
-                    stroke: '#000000',
-                    strokeThickness: 3
-                }).setOrigin(0.5);
-                
-                const restartText = this.add.text(400, 380, 'Press SPACE to restart', {
-                    fontSize: '20px',
-                    color: '#AAAAAA',
-                    fontStyle: 'bold'
-                }).setOrigin(0.5);
-                
-                // Flashing restart text
-                this.tweens.add({
-                    targets: restartText,
-                    alpha: 0.3,
-                    duration: 800,
-                    yoyo: true,
-                    repeat: -1
-                });
-                
-                // Restart game on spacebar
-                const spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-                spaceKey.on('down', () => {
-                    // Reset game variables
-                    score = 0;
-                    level = 1;
-                    lives = 3;
-                    gameOver = false;
-                    
-                    this.scene.restart();
-                });
-            }
-        }
-
-        // Game configuration
-        const config = {
-            type: Phaser.AUTO,
-            width: 800,
-            height: 600,
-            parent: 'game',
-            backgroundColor: '#2c3e50',
-            physics: {
-                default: 'arcade',
-                arcade: {
-                    gravity: { y: 300 },
-                    debug: false
-                }
-            },
-            scene: GameScene
-        };
-
-        // Start the game
-        const game = new Phaser.Game(config);
-    </script>
+    <script src="game.js"></script>
 </body>
 </html>
