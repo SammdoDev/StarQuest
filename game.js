@@ -351,10 +351,12 @@ class GameScene extends Phaser.Scene {
       });
 
       // Background music - only one instance needed
+      if (!this.bgMusic) {
       this.bgMusic = this.sound.add("bgMusic", {
-        volume: 0.15, // Lower volume for background music
+        volume: 0.15,
         loop: true,
       });
+    }
 
       // FIXED: Start background music immediately when game starts
       // No need to wait for user interaction since game starts on button press

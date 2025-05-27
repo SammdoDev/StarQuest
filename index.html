@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>StarQuest</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.70.0/phaser.min.js"></script>
+    <script src="game.js"></script>
     <style>
         body {
             margin: 0;
@@ -15,113 +16,142 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            overflow: hidden;
+            touch-action: manipulation;
         }
         
         h1 {
             color: white;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            margin: 20px 0;
-            font-size: 2.5em;
+            margin: 10px 0;
+            font-size: clamp(1.5em, 4vw, 2.5em);
+            text-align: center;
         }
         
         #gameContainer {
-            margin: 20px 0;
+            margin: 10px 0;
             border-radius: 10px;
             overflow: hidden;
             box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             background: #000;
+            max-width: 95vw;
+            max-height: 60vh;
         }
         
         #startGameBtn {
             background: linear-gradient(145deg, #4CAF50, #45a049);
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 12px 25px;
+            font-size: 16px;
             border-radius: 25px;
             cursor: pointer;
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
-            margin: 20px;
+            margin: 10px;
+            touch-action: manipulation;
         }
         
-        #startGameBtn:hover {
+        #startGameBtn:hover, #startGameBtn:active {
             transform: translateY(-2px);
             box-shadow: 0 12px 20px rgba(0,0,0,0.3);
         }
         
         #mobileControls {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 20px;
             backdrop-filter: blur(10px);
-            max-width: 90vw;
         }
         
         .control-btn {
             width: 60px;
             height: 60px;
-            border: none;
+            border: 3px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            background: linear-gradient(145deg, #f0f0f0, #cacaca);
-            box-shadow: 
-                5px 5px 10px rgba(0,0,0,0.2),
-                -5px -5px 10px rgba(255,255,255,0.8);
-            color: #333;
-            font-size: 16px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.1s ease;
             user-select: none;
             touch-action: manipulation;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
         }
         
         .control-btn:active {
-            box-shadow: 
-                2px 2px 5px rgba(0,0,0,0.2) inset,
-                -2px -2px 5px rgba(255,255,255,0.8) inset;
-            transform: scale(0.95);
+            background: rgba(255,255,255,0.4);
+            transform: scale(0.9);
+            border-color: rgba(255,255,255,0.6);
         }
         
         .control-row {
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: center;
         }
         
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2em;
-                text-align: center;
-            }
-            
-            #mobileControls {
-                position: fixed;
-                bottom: 20px;
-                left: 50%;
-                transform: translateX(-50%);
-                z-index: 1000;
-                margin: 0;
+        #jumpBtn {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+        
+        #jumpBtn:active {
+            background: rgba(76, 175, 80, 0.6);
+        }
+        
+        @media (max-width: 480px) {
+            #gameContainer {
+                max-height: 50vh;
             }
             
             .control-btn {
                 width: 50px;
                 height: 50px;
-                font-size: 14px;
+                font-size: 18px;
+            }
+            
+            #mobileControls {
+                bottom: 10px;
+                padding: 10px;
             }
         }
         
+        @media (orientation: landscape) and (max-height: 500px) {
+            h1 {
+                font-size: 1.2em;
+                margin: 5px 0;
+            }
+            
+            #gameContainer {
+                max-height: 45vh;
+            }
+            
+            #mobileControls {
+                right: 20px;
+                left: auto;
+                transform: none;
+                flex-direction: row;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
     <h1>🌟 StarQuest 🌟</h1>
-
     
     <button id="startGameBtn">🎮 Start Game</button>
     
@@ -130,15 +160,120 @@
     </div>
     
     <div id="mobileControls">
+
         <div class="control-row">
             <button class="control-btn" id="leftBtn">←</button>
             <button class="control-btn" id="rightBtn">→</button>
-        </div>
-        <div class="control-row">
             <button class="control-btn" id="jumpBtn">↑</button>
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <script>
+
+        // Initialize mobile controls with proper event handling
+        function initializeMobileControls() {
+            const leftBtn = document.getElementById("leftBtn");
+            const rightBtn = document.getElementById("rightBtn");
+            const jumpBtn = document.getElementById("jumpBtn");
+
+            // Prevent default touch behaviors
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            // Add touch controls for each button
+            function addTouchControls(btn, control) {
+                if (!btn) return;
+
+                // Touch events
+                btn.addEventListener(
+                    "touchstart",
+                    (e) => {
+                        preventDefaults(e);
+                        mobileControls[control] = true;
+                        btn.style.transform = "scale(0.95)";
+                    },
+                    { passive: false }
+                );
+
+                btn.addEventListener(
+                    "touchend",
+                    (e) => {
+                        preventDefaults(e);
+                        mobileControls[control] = false;
+                        btn.style.transform = "scale(1)";
+                    },
+                    { passive: false }
+                );
+
+                btn.addEventListener(
+                    "touchcancel",
+                    (e) => {
+                        preventDefaults(e);
+                        mobileControls[control] = false;
+                        btn.style.transform = "scale(1)";
+                    },
+                    { passive: false }
+                );
+
+                // Mouse events for desktop testing
+                btn.addEventListener("mousedown", (e) => {
+                    preventDefaults(e);
+                    mobileControls[control] = true;
+                    btn.style.transform = "scale(0.95)";
+                });
+
+                btn.addEventListener("mouseup", (e) => {
+                    preventDefaults(e);
+                    mobileControls[control] = false;
+                    btn.style.transform = "scale(1)";
+                });
+
+                btn.addEventListener("mouseleave", (e) => {
+                    mobileControls[control] = false;
+                    btn.style.transform = "scale(1)";
+                });
+            }
+
+            addTouchControls(leftBtn, "left");
+            addTouchControls(rightBtn, "right");
+            addTouchControls(jumpBtn, "jump");
+        }
+
+
+        // Game configuration
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            parent: "game",
+            backgroundColor: "#2c3e50",
+            physics: {
+                default: "arcade",
+                arcade: {
+                    gravity: { y: 300 },
+                    debug: false,
+                },
+            },
+            scene: GameScene,
+            scale: {
+                mode: Phaser.Scale.FIT,
+                autoCenter: Phaser.Scale.CENTER_BOTH,
+                width: 800,
+                height: 600,
+            },
+        };
+
+        // Initialize game when DOM is ready
+        document.addEventListener("DOMContentLoaded", () => {
+            initializeMobileControls();
+
+            document.getElementById("startGameBtn").addEventListener("click", () => {
+                document.getElementById("startGameBtn").style.display = "none";
+                new Phaser.Game(config);
+            });
+        });
+    </script>
 </body>
 </html>
