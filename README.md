@@ -43,21 +43,6 @@
 
 ---
 
-## 📁 Struktur Folder
-
-/
-├── index.html
-├── js/
-│ └── game.js
-├── assets/
-│ ├── images/
-│ └── screenshots/
-│ ├── start.jpg
-│ ├── gameplay.jpg
-│ └── gameover.jpg
-
----
-
 ## 📜 Lisensi
 
 Game ini dibuat untuk pembelajaran dan hiburan. Silakan gunakan dan modifikasi dengan bebas untuk keperluan non-komersial.
