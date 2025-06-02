@@ -118,12 +118,6 @@ class GameScene extends Phaser.Scene {
     });
 
     // Load external assets (optional)
-    this.load.image("sky", "assets/sky.png");
-    this.load.spritesheet("dude", "assets/dude.png", {
-      frameWidth: 150,
-      frameHeight: 190,
-    });
-    this.load.image("enemy", "assets/enemy.png");
     this.load.audio("bgMusic", "assets/ambience.mp3");
     this.load.audio("collectStar", "assets/collect.mp3");
     this.load.audio("playerDead", "assets/dead.mp3");
@@ -136,7 +130,7 @@ class GameScene extends Phaser.Scene {
   createFallbackAssets() {
     const createSky = () => {
       const g = this.add.graphics();
-      g.fillGradientStyle(0x87ceeb, 0x4169e1, 0x87ceeb, 0x4169e1, 1);
+      g.fillGradientStyle(0xe0ffff, 0xb0e0e6, 0xadd8e6, 0x4682b4, 1);
       g.fillRect(0, 0, 800, 600);
       g.generateTexture("sky", 800, 600);
       g.destroy();
@@ -144,25 +138,45 @@ class GameScene extends Phaser.Scene {
 
     const createPlatform = () => {
       const g = this.add.graphics();
-      g.fillStyle(0x228b22);
+
+      // Es biru terang
+      g.fillStyle(0xadd8e6); // light blue
       g.fillRoundedRect(0, 0, 400, 32, 8);
-      g.lineStyle(2, 0x006400);
+
+      // Retakan es
+      g.lineStyle(2, 0xffffff); // putih untuk retakan es
+      g.beginPath();
+      g.moveTo(20, 20);
+      g.lineTo(60, 12);
+      g.lineTo(100, 18);
+      g.lineTo(140, 10);
+      g.lineTo(180, 20);
+      g.lineTo(220, 14);
+      g.lineTo(260, 22);
+      g.lineTo(300, 16);
+      g.lineTo(340, 20);
+      g.lineTo(380, 14);
+      g.strokePath();
+
+      // Outline biru tua
+      g.lineStyle(2, 0x4682b4);
       g.strokeRoundedRect(0, 0, 400, 32, 8);
+
       g.generateTexture("ground", 400, 32);
       g.destroy();
     };
 
     const createStar = () => {
       const g = this.add.graphics();
-      g.fillStyle(0xffd700);
-      g.lineStyle(2, 0xffa500);
       const cx = 12,
         cy = 12;
+      g.fillStyle(0xffe066); // lebih lembut dari gold
+      g.lineStyle(2, 0xffb347); // orange muda
 
       g.beginPath();
       for (let i = 0; i < 10; i++) {
         const angle = (i * Math.PI) / 5;
-        const radius = i % 2 === 0 ? 12 : 6;
+        const radius = i % 2 === 0 ? 10 : 5;
         const x = cx + Math.cos(angle) * radius;
         const y = cy + Math.sin(angle) * radius;
         i === 0 ? g.moveTo(x, y) : g.lineTo(x, y);
@@ -177,48 +191,80 @@ class GameScene extends Phaser.Scene {
     const createPlayer = () => {
       const g = this.add.graphics();
 
-      // Body - oval
-      g.fillStyle(0x4169e1); // biru
-      g.fillEllipse(16, 28, 20, 32);
+      // Badan utama (kubus)
+      g.fillStyle(0x1e90ff); // biru dodger
+      g.fillRoundedRect(0, 0, 32, 32, 6);
 
-      // Head - bulat
-      g.fillStyle(0xffdbb5); // warna kulit
-      g.fillCircle(16, 10, 10);
+      // Mata putih
+      g.fillStyle(0xffffff);
+      g.fillCircle(10, 12, 4);
+      g.fillCircle(22, 12, 4);
 
-      // Arms - kecil di samping
-      g.fillStyle(0x4169e1);
-      g.fillEllipse(6, 28, 4, 12);
-      g.fillEllipse(26, 28, 4, 12);
-
-      // Eyes
+      // Bola mata hitam
       g.fillStyle(0x000000);
-      g.fillCircle(12, 8, 2);
-      g.fillCircle(20, 8, 2);
+      g.fillCircle(10, 12, 2);
+      g.fillCircle(22, 12, 2);
 
-      // Smile - semi-oval senyum
+      // Alis (menambah ekspresi)
       g.lineStyle(2, 0x000000);
       g.beginPath();
-      g.arc(16, 12, 5, 0, Math.PI, false);
+      g.moveTo(6, 7);
+      g.lineTo(14, 9);
+      g.moveTo(26, 7);
+      g.lineTo(18, 9);
       g.strokePath();
 
-      g.generateTexture("dude", 32, 48);
+      // Mulut senyum
+      g.lineStyle(2, 0x000000);
+      g.beginPath();
+      g.arc(16, 20, 6, 0, Math.PI, false);
+      g.strokePath();
+
+      // Outline
+      g.lineStyle(2, 0x000000);
+      g.strokeRoundedRect(0, 0, 32, 32, 6);
+
+      g.generateTexture("dude", 32, 32);
       g.destroy();
     };
 
     const createEnemy = () => {
       const g = this.add.graphics();
-      g.fillStyle(0xff4444);
-      g.fillRoundedRect(0, 8, 32, 24, 4);
-      // Spikes
-      g.fillStyle(0x990000);
+
+      // Badan merah gelap
+      g.fillStyle(0x8b0000); // dark red
+      g.fillRoundedRect(0, 8, 32, 24, 6);
+
+      // Spikes tajam atas
+      g.fillStyle(0x330000);
       for (let i = 0; i < 4; i++) {
         const x = i * 8 + 4;
         g.fillTriangle(x, 8, x + 4, 0, x + 8, 8);
       }
-      // Eyes
-      g.fillStyle(0xffff00);
-      g.fillCircle(10, 18, 2);
-      g.fillCircle(22, 18, 2);
+
+      // Mata menyala (kuning kemerahan)
+      g.fillStyle(0xffcc00);
+      g.fillCircle(10, 18, 3.5);
+      g.fillCircle(22, 18, 3.5);
+
+      // Pupil merah
+      g.fillStyle(0xff0000);
+      g.fillCircle(10, 18, 1.5);
+      g.fillCircle(22, 18, 1.5);
+
+      // Mulut gelap
+      g.fillStyle(0x000000);
+      g.fillRoundedRect(10, 24, 12, 4, 1);
+
+      // Taring tajam
+      g.fillStyle(0xffffff);
+      g.fillTriangle(12, 24, 13, 28, 14, 24);
+      g.fillTriangle(18, 24, 19, 28, 20, 24);
+
+      // Outline
+      g.lineStyle(2, 0x550000);
+      g.strokeRoundedRect(0, 8, 32, 24, 6);
+
       g.generateTexture("enemy", 32, 32);
       g.destroy();
     };
@@ -352,11 +398,11 @@ class GameScene extends Phaser.Scene {
 
       // Background music - only one instance needed
       if (!this.bgMusic) {
-      this.bgMusic = this.sound.add("bgMusic", {
-        volume: 0.15,
-        loop: true,
-      });
-    }
+        this.bgMusic = this.sound.add("bgMusic", {
+          volume: 0.15,
+          loop: true,
+        });
+      }
 
       // FIXED: Start background music immediately when game starts
       // No need to wait for user interaction since game starts on button press
